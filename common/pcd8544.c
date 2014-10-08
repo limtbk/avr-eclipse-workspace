@@ -5,9 +5,10 @@
  *      Author: lim
  */
 
-#include "pcd8544.h"
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#include "pcd8544.h"
 #include "timer1.h"
 
 const uint8_t PROGMEM font5x7 [][CHAR_WIDTH - 1] = {

@@ -5,7 +5,10 @@
  *      Author: lim
  */
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #include "usart.h"
+#include "macro.h"
 
 uint8_t usart_rx_wp;
 uint8_t usart_rx_rp;

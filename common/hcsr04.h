@@ -10,8 +10,12 @@
 
 #include "ports.h"
 
+#ifndef HCSR04_TRIG
 #define HCSR04_TRIG PORTA_D2
+#endif
+#ifndef HCSR04_ECHO
 #define HCSR04_ECHO PORTA_D10
+#endif
 
 void initHCSR04(void);
 uint16_t getDistance();

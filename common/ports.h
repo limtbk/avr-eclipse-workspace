@@ -1,4 +1,4 @@
-* ports.h
+/* ports.h
  *
  *  Created on: Sep 26, 2014
  *      Author: lim
@@ -61,11 +61,7 @@
 #define PORT_F6 PORTF,DDRF,PINF,PF6
 #define PORT_F7 PORTF,DDRF,PINF,PF7
 
-#ifdef __AVR_ATmega16__
-
-#endif
-
-#ifdef __AVR_ATmega32U4__
+#if defined(__AVR_ATmega32U4__)
 #define PORTA_D0 PORT_D2
 #define PORTA_D1 PORT_D3
 #define PORTA_D2 PORT_D1
@@ -91,9 +87,7 @@
 #define PORTA_A5 PORT_F0
 #define TXLED PORT_D5
 #define RXLED PORT_B0
-#endif
-
-#ifdef __AVR_ATmega328P__
+#elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168P__)
 #define PORTA_D0 PORT_D0
 #define PORTA_D1 PORT_D1
 #define PORTA_D2 PORT_D2
@@ -116,6 +110,41 @@
 #define PORTA_A5 PORT_C5
 #define TXLED PORT_B5
 #define RXLED PORT_B5
+#elif defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)
+#define PORTA_D0 PORT_B0 //RXD
+#define PORTA_D1 PORT_B1 //TXD
+#define PORTA_D2 PORT_B2
+#define PORTA_D3 PORT_B3
+#define PORTA_D4 PORT_B4
+#define PORTA_D5 PORT_B5 //MOSI
+#define PORTA_D6 PORT_B6 //MISO
+#define PORTA_D7 PORT_B7 //SCK
+#define PORTA_D8 PORT_D0
+#define PORTA_D9 PORT_D1
+#define PORTA_D10 PORT_D2
+#define PORTA_D11 PORT_D3
+#define PORTA_D12 PORT_D4
+#define PORTA_D13 PORT_D5
+#define PORTA_D14 PORT_D6
+#define PORTA_D15 PORT_D7
+#define PORTA_D16 PORT_C0
+#define PORTA_D17 PORT_C1
+#define PORTA_D18 PORT_C2
+#define PORTA_D19 PORT_C3
+#define PORTA_D20 PORT_C4
+#define PORTA_D21 PORT_C5
+#define PORTA_D22 PORT_C6
+#define PORTA_D23 PORT_C7
+#define PORTA_A0 PORT_A0
+#define PORTA_A1 PORT_A1
+#define PORTA_A2 PORT_A2
+#define PORTA_A3 PORT_A3
+#define PORTA_A4 PORT_A4
+#define PORTA_A5 PORT_A5
+#define PORTA_A6 PORT_A6
+#define PORTA_A7 PORT_A7
+#define TXLED PORT_B7
+#define RXLED PORT_B7
 #endif
 
 #define SETPM(port, ddr, pin, portnum) port = (port | (1<<portnum))
