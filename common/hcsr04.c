@@ -9,7 +9,7 @@
 #include "timer1.h"
 #include "hcsr04.h"
 
-void initHCSR04(void) {
+void hcsr04_init(void) {
 	CLRP(HCSR04_ECHO);
 	CLRD(HCSR04_ECHO);
 	CLRP(HCSR04_TRIG);
@@ -19,7 +19,7 @@ void initHCSR04(void) {
 void trigger() {
 	INVP(TXLED);
 	SETP(HCSR04_TRIG);
-	delay_us2(20); //10us
+	timer1_delay_us2(20); //10us
 	CLRP(HCSR04_TRIG);
 	INVP(TXLED);
 }
@@ -28,15 +28,15 @@ uint16_t measure() {
 	INVP(RXLED);
 	while (!PINV(HCSR04_ECHO)) {
 	}
-	measureTime();
+	timer1_measureTime();
 	while (PINV(HCSR04_ECHO)) {
 	}
-	uint16_t result = measureTime();
+	uint16_t result = timer1_measureTime();
 	INVP(RXLED);
 	return result;
 }
 
-uint16_t getDistance() {
+uint16_t hcsr04_getDistance() {
 	trigger();
 	return measure();
 }

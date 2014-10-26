@@ -17,7 +17,7 @@
 #define HCSR04_ECHO PORTA_D10
 #endif
 
-void initHCSR04(void);
-uint16_t getDistance();
+void hcsr04_init(void);
+uint16_t hcsr04_getDistance();
 
 #endif /* HCSR04_H_ */

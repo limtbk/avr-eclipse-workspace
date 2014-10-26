@@ -10,7 +10,7 @@
 
 uint16_t timer1_lastTime;
 
-void initTimer1(void) {
+void timer1_init(void) {
 #if defined (__AVR_ATmega32U4__)
 	TCCR1A = (0<<COM1A1)|(0<<COM1A0)|(0<<COM1B1)|(0<<COM1B0)|(0<<COM1C1)|(0<<COM1C0)|(0<<WGM11)|(0<<WGM10);
 	TCCR1B = (0<<ICNC1)|(0<<ICES1)|(0<<WGM13)|(0<<WGM12)|(0<<CS12)|(1<<CS11)|(0<<CS10); //Normal, clk/8
@@ -31,14 +31,14 @@ void resetTimer1(void) {
 	TCNT1 = 0;
 }
 
-uint16_t measureTime(void) {
+uint16_t timer1_measureTime(void) {
 	uint16_t time = TCNT1;
 	uint16_t result = time - timer1_lastTime;
 	timer1_lastTime = time;
 	return result;
 }
 
-void delay_us2(uint16_t timeInterval) {
+void timer1_delay_us2(uint16_t timeInterval) {
 	timeInterval = timeInterval;
 	uint16_t startTime = TCNT1;
 	uint16_t currentTime = TCNT1;
@@ -47,9 +47,9 @@ void delay_us2(uint16_t timeInterval) {
 	}
 }
 
-void delay_ms(uint16_t timeInterval) {
+void timer1_delay_ms(uint16_t timeInterval) {
 	for (uint16_t t = 0; t < timeInterval; t++) {
-		delay_us2(2000);
+		timer1_delay_us2(2000);
 	}
 }
 

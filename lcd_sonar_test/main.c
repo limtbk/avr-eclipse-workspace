@@ -7,6 +7,12 @@
 #include "timer1.h"
 #include "usart.h"
 
+#include "i2c.h"
+
+#define SCL_CLOCK 100000L
+//#define DS1307_I2C_ADDRESS 0x68
+
+
 void init(void) {
 	SETD(TXLED);
 	SETD(RXLED);
@@ -14,10 +20,11 @@ void init(void) {
 #ifdef __AVR_ATmega32U4__
 	USBCON = (0<<USBE)|(1<<FRZCLK)|(0<<OTGPADE)|(0<<VBUSTE);
 #endif
-	initTimer1();
-	initHCSR04();
+	timer1_init();
+	hcsr04_init();
 	lcd_init();
-	initUSART();
+	usart_init();
+	i2c_init();
 	sei();
 }
 
@@ -51,11 +58,81 @@ int main(void)
 	lcd_rotate(1);
 	lcd_clear(0x00);
 
+	lcd_putstr("..............");
+	/*
+	for (uint16_t j = 0; j < 16384; j++) {
+		//scan i2c dev
+		lcd_textpos(0,0);
+		for (uint8_t i = 1; i < 127; i++) {
+			uint8_t res1 = i2c_start(i << 1);
+			uint8_t res2 = 0;//i2c_write(0);
+			if (res1 == 0) {
+				res2 = i2c_write(0);
+			}
+
+			i2c_stop();
+			lcd_printhex(i);
+			lcd_putstr("  ");
+			lcd_printhex(res1);
+			lcd_printhex(res2);
+			lcd_putstr("      ");
+		}
+	}
+*/
+	/*
+	uint8_t res = 0;
+	res = i2c_start(0x68 << 1);
+	lcd_putstr("#");
+	lcd_printhex(res);
+	if (res == 0) {
+		res = i2c_write(0);
+
+		res = i2c_write(0x00);
+		res = i2c_write(0x53);
+		res = i2c_write(0x02);
+		res = i2c_write(3);
+		res = i2c_write(0x22);
+		res = i2c_write(0x10);
+		res = i2c_write(0x14);
+		res = i2c_write(0b10010011);
+	}
+	i2c_stop();
+	*/
+
+	for (uint16_t j = 0; j < 16384; j++) {
+		lcd_textpos(0,0);
+		lcd_printhex(j);
+		lcd_putstr("#");
+
+		uint8_t res = 0;
+		res = i2c_start(0x68 << 1);
+		lcd_putstr("#");
+		lcd_printhex(res);
+		if (res == 0) {
+			res = i2c_write(0);
+			lcd_printhex(res);
+			res = i2c_start((0x68 << 1) | 0x01); //repeated start
+			lcd_printhex(res);
+			lcd_putstr("#   ");
+
+			for (uint8_t i = 0; i < 35; i++) {
+				res = i2c_readAck();
+				lcd_printhex(res);
+			}
+			res = i2c_readNak();
+			lcd_printhex(res);
+		}
+		i2c_stop();
+
+	}
+
+
+
 //	uint8_t x = 0;
 	uint32_t avg_dist = 0;
 	while (1) {
 		lcd_textpos(0,0);
-		uint16_t dist = getDistance();
+		uint16_t dist = hcsr04_getDistance();
 		avg_dist = (dist + 7*avg_dist)>>3;
 //		uint16_t div_factor = 116;
 		uint16_t dist_cm = avg_dist/116;
@@ -66,7 +143,7 @@ int main(void)
 		lcd_printdec(dist_cm);
 		lcd_printdec(avg_dist);
 		lcd_printdec(dist);
-		printhex(dist);
+		usart_printhex(dist);
 //		uint8_t dst = (dist>>7)%LCD_HEIGHT;
 //		lcd_overlay(0);
 //		lcd_line(x, LCD_HEIGHT-1, x, 0);

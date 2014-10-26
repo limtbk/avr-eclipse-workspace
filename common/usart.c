@@ -18,7 +18,7 @@ uint8_t usart_tx_wp;
 uint8_t usart_tx_rp;
 char usart_tx_buf[USART_TX_BUF];
 
-void initUSART(void)
+void usart_init(void)
 {
 	UBRR0L = LO(BAUDDIVIDER);
 	UBRR0H = HI(BAUDDIVIDER);
@@ -53,7 +53,7 @@ ISR(USART_TX_vect)
 	}
 }
 
-void putchr(char ch)
+void usart_putchr(char ch)
 {
 	sei();
 	while (usart_tx_wp>=USART_TX_BUF) {}
@@ -72,15 +72,15 @@ void putchr(char ch)
 	}
 }
 
-char chrready(void)
+char usart_chrready(void)
 {
 	return (usart_rx_wp>usart_rx_rp);
 }
 
-char getchr(void)
+char usart_getchr(void)
 {
 	sei();
-	while (!chrready());
+	while (!usart_chrready());
 	cli();
 	char c = usart_rx_buf[usart_rx_rp];
 	usart_rx_rp++;
@@ -92,32 +92,32 @@ char getchr(void)
 	return c;
 }
 
-void printstr(char *string)
+void usart_printstr(char *string)
 {
 	while (*string!='\0')
 	{
-		putchr(*string);
+		usart_putchr(*string);
 		string++;
 	}
 }
 
-char chartohex(char c) //only for 0x00 - 0x0F
+char usart_chartohex(char c) //only for 0x00 - 0x0F
 {
 	char ch = c & 0x0F;
 	char hx = ((ch<10)?(ch+'0'):(ch+'A'-10));
 	return hx;
 }
 
-char hextochar(char c)
+char usart_hextochar(char c)
 {
 	char ch = (c<='9')?(c-'0'):((c<='F')?(c-'A'+10):((c<='f')?(c-'a'+10):0));
 	return ch;
 }
 
-void printhex(char c)
+void usart_printhex(char c)
 {
 	char lo = c & 0x0F;
 	char hi = (c & 0xF0) >> 4;
-	putchr(hi + ((hi<10)?'0':'A'-10));
-	putchr(lo + ((lo<10)?'0':'A'-10));
+	usart_putchr(hi + ((hi<10)?'0':'A'-10));
+	usart_putchr(lo + ((lo<10)?'0':'A'-10));
 }

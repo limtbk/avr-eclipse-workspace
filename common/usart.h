@@ -12,13 +12,13 @@
 #define USART_TX_BUF 32
 #define USART_RX_BUF 32
 
-void initUSART(void);
-void putchr(char ch);
-char chrready(void);
-char getchr(void);
-void printstr(char *string);
-char chartohex(char c);
-char hextochar(char c);
-void printhex(char c);
+void usart_init(void);
+void usart_putchr(char ch);
+char usart_chrready(void);
+char usart_getchr(void);
+void usart_printstr(char *string);
+char usart_chartohex(char c);
+char usart_hextochar(char c);
+void usart_printhex(char c);
 
 #endif /* USART_H_ */

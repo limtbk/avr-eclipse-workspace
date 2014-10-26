@@ -222,12 +222,12 @@ void lcd_init(void)
 	SETD(LCD_LED);
 
 	SETP(LCD_RST);
-	delay_us2(30000); //delay 15ms
+	timer1_delay_us2(30000); //delay 15ms
 	CLRP(LCD_RST);
-	delay_us2(32000); //delay 64ms
-	delay_us2(32000);
-	delay_us2(32000);
-	delay_us2(32000);
+	timer1_delay_us2(32000); //delay 64ms
+	timer1_delay_us2(32000);
+	timer1_delay_us2(32000);
+	timer1_delay_us2(32000);
 	SETP(LCD_RST);
 	SETP(LCD_CE);
 

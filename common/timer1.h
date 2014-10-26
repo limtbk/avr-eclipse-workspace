@@ -8,9 +8,9 @@
 #ifndef TIMER1_H_
 #define TIMER1_H_
 
-void initTimer1(void);
-void delay_us2(uint16_t timeInterval);
-void delay_ms(uint16_t timeInterval);
-uint16_t measureTime(void);
+void timer1_init(void);
+void timer1_delay_us2(uint16_t timeInterval);
+void timer1_delay_ms(uint16_t timeInterval);
+uint16_t timer1_measureTime(void);
 
 #endif /* TIMER1_H_ */
