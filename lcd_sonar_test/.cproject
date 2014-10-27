@@ -45,6 +45,8 @@
 								<option id="de.innot.avreclipse.linker.option.libpath.1593357764" name="Libraries Path (-L)" superClass="de.innot.avreclipse.linker.option.libpath"/>
 								<option id="de.innot.avreclipse.linker.option.otherobjs.193515483" name="Other Objects (*.o)" superClass="de.innot.avreclipse.linker.option.otherobjs" valueType="userObjs">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/hcsr04.o}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/ds13xx.o}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/i2c.o}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/pcd8544.o}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/timer1.o}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/usart.o}&quot;"/>
