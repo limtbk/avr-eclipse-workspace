@@ -9,7 +9,7 @@
 #define MACRO_H_
 
 #define HI(x) ((x)>>8)
-#define LO(x) ((x)& 0xFF)
+#define LO(x) ((x) & 0xFF)
 #define bv(bit) (1<<(bit))
 #define cbi(reg,bit) reg &= ~(bv(bit))
 #define sbi(reg,bit) reg |= (bv(bit))
