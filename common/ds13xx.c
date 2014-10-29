@@ -154,7 +154,7 @@ uint8_t ds13xx_writebytes(uint8_t addr, void *src, uint8_t count) {
 }
 
 uint8_t dectobin(uint8_t dec) {
-	uint8_t bin = (dec & 0x0F) + (dec & 0xF0) * 10;
+	uint8_t bin = (dec & 0x0F) + ((dec & 0xF0) >> 4) * 10;
 	return bin;
 }
 
