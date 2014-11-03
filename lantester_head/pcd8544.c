@@ -134,6 +134,7 @@ TTextBuf text_buf;
 uint8_t overlay;
 uint8_t rotate;
 uint8_t optimize_chg;
+uint8_t autosendbuf;
 
 void lcd_send_data(uint8_t data, uint8_t isData, uint8_t isReverse)
 {
@@ -199,7 +200,9 @@ void lcd_send_text_buffer(void)
     }
     video_buf.chg_start = 0;
     video_buf.chg_length = LCD_BYTES;
-    lcd_send_buffer();
+    if (autosendbuf != 0) {
+    	lcd_send_buffer();
+    }
 }
 
 void lcd_clear(uint8_t pattern)
@@ -209,7 +212,9 @@ void lcd_clear(uint8_t pattern)
     }
     video_buf.chg_start = 0;
     video_buf.chg_length = LCD_BYTES;
-    lcd_send_buffer();
+    if (autosendbuf != 0) {
+    	lcd_send_buffer();
+    }
 }
 
 void lcd_init(void)
@@ -246,6 +251,7 @@ void lcd_init(void)
     lcd_clear(0x00);
     overlay = 0;
     rotate = 0;
+    autosendbuf = 1;
     SETP(LCD_LED);
 }
 
@@ -283,6 +289,10 @@ void lcd_optimize(uint8_t poptimize) {
 	optimize_chg = poptimize;
 }
 
+void lcd_autosendbuf(uint8_t autosend) {
+	autosendbuf = autosend;
+}
+
 void lcd_point(uint8_t x, uint8_t y) {
 	if ((x<LCD_WIDTH) && (y<LCD_HEIGHT)) {
 		uint16_t point_address = x + (y >> 3)*LCD_WIDTH;
@@ -301,6 +311,9 @@ void lcd_point(uint8_t x, uint8_t y) {
 			video_buf.chg_start = point_address;
 		}
 	}
+    if (autosendbuf != 0) {
+    	lcd_send_buffer();
+    }
 }
 
 void lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
@@ -314,6 +327,9 @@ void lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) {
 		if (e2 >-dx) { err -= dy; x0 += sx; }
 		if (e2 < dy) { err += dx; y0 += sy; }
 	}
+    if (autosendbuf != 0) {
+    	lcd_send_buffer();
+    }
 }
 
 void lcd_cliplot(uint8_t cx, uint8_t cy, uint8_t x, uint8_t y) {
@@ -340,4 +356,7 @@ void lcd_circle(uint8_t x0, uint8_t y0, uint8_t r) {
 		}
 		lcd_cliplot(x0,y0,x,y);
 	}
+    if (autosendbuf != 0) {
+    	lcd_send_buffer();
+    }
 }

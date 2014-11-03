@@ -39,6 +39,7 @@ void lcd_clear(uint8_t pattern);
 void lcd_textpos(uint8_t x, uint8_t y);
 void lcd_putchar(char ch);
 void lcd_putstr(char *str);
+void lcd_autosendbuf(uint8_t autosend);
 void lcd_overlay(uint8_t overlay);
 void lcd_rotate(uint8_t rotate);
 void lcd_optimize(uint8_t optimize);

@@ -53,18 +53,18 @@ void loop() {
 	for (uint8_t sh = 0; sh < 8; sh++) {
 		rv = rp & 0b01010101;
 		set_outs(rv);
-		timer1_delay_ms(5);
+		timer1_delay_ms(1);
 		set_outs(0);
-		timer1_delay_ms(5);
+		timer1_delay_ms(1);
 		rv = rp & 0b10101010;
 		set_outs(rv);
-		timer1_delay_ms(5);
+		timer1_delay_ms(1);
 		set_outs(0);
-		timer1_delay_ms(5);
+		timer1_delay_ms(1);
 		rp = rp << 1;
 	}
 	disable_outs();
-	timer1_delay_ms(80);
+//	timer1_delay_ms(80);
 }
 
 int main (void) {
