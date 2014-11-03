@@ -61,7 +61,15 @@
 #define PORT_F6 PORTF,DDRF,PINF,PF6
 #define PORT_F7 PORTF,DDRF,PINF,PF7
 
-#if defined(__AVR_ATmega32U4__)
+#if defined(__AVR_ATtiny13__)
+#define PORTA_D8 PORT_B0 //MOSI/AIN0/OC0A/PCINT0
+#define PORTA_D9 PORT_B1 //MISO/AIN1/OC0B/INT0/PCINT1
+#define PORTA_D10 PORT_B2 //SCK/ADC1/T0/PCINT2
+#define PORTA_D11 PORT_B3 //PCINT3/CLKI/ADC3
+#define PORTA_D12 PORT_B4 //PCINT4/ADC2
+#define PORTA_D13 PORT_B5 //PCINT5/RESET/ADC0/dW
+
+#elif defined(__AVR_ATmega32U4__)
 #define PORTA_D0 PORT_D2
 #define PORTA_D1 PORT_D3
 #define PORTA_D2 PORT_D1
@@ -87,7 +95,7 @@
 #define PORTA_A5 PORT_F0
 #define TXLED PORT_D5
 #define RXLED PORT_B0
-#elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168P__)
+#elif defined(__AVR_ATmega328P__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega168__)
 #define PORTA_D0 PORT_D0
 #define PORTA_D1 PORT_D1
 #define PORTA_D2 PORT_D2
