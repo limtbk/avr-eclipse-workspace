@@ -9,10 +9,10 @@
 #include <avr/pgmspace.h>
 #include "ports.h"
 
-#define RED_LED PORT_B3
-#define IR_LED PORT_B4
-#define RIGHT_BUTTON PORT_B0
-#define LEFT_BUTTON PORT_B1
+#define RED_LED PORT_B3 //PCINT3/CLKI/ADC3
+#define IR_LED PORT_B4 //PCINT4/ADC2
+#define RIGHT_BUTTON PORT_B0 //MOSI/AIN0/OC0A/PCINT0
+#define LEFT_BUTTON PORT_B1 //MISO/AIN1/OC0B/INT0/PCINT1
 
 const uint16_t PROGMEM deltaTimes[] = {180, 2208, 52, 110, 46, 268, 52, 5040, 180, 2208, 52, 110, 46, 268, 52, 5000};
 #define DELTA_TIMES_LENGTH 16
