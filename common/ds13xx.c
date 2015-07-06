@@ -18,6 +18,15 @@ TTime ttime(uint8_t hour, uint8_t min, uint8_t sec) {
 	return result;
 }
 
+TDate tdate(uint8_t weekday, uint8_t day, uint8_t month, uint8_t year) {
+	TDate result;
+	result.weekday = weekday;
+	result.day = day;
+	result.month = month;
+	result.year = year;
+	return result;
+}
+
 uint8_t ds13xx_settime(TTime time, uint8_t bcd) {
 	uint8_t res = 0;
 	res = i2c_start(DS1307_I2C_ADDRESS << 1);
@@ -90,6 +99,23 @@ uint8_t ds13xx_getdate(TDate *date, uint8_t bcd) {
 			date->day = dectobin(date->day);
 			date->month = dectobin(date->month);
 			date->year = dectobin(date->year);
+		}
+		i2c_stop();
+	}
+	return res;
+}
+
+uint8_t ds13xx_gettemperature(TTemperature *temperature, uint8_t bcd) {
+	uint8_t res = 0;
+	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	if (res == 0) {
+		res |= i2c_write(0x11);
+		res |= i2c_start((DS1307_I2C_ADDRESS << 1) | 0x01);
+		temperature->intPart = i2c_readAck();
+		temperature->fracPart = i2c_readNak();
+		if (bcd != 0) {
+			temperature->intPart = bintodec(temperature->intPart);
+			temperature->fracPart = bintodec(temperature->fracPart);
 		}
 		i2c_stop();
 	}
