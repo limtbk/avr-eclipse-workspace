@@ -32,6 +32,21 @@
 #define ON_LVL_BTN PORTA_D12
 #define PUMP_CTRL PORTA_D9
 
+typedef struct SettingsStruct {
+	uint16_t onLevel;
+	uint16_t offLevel;
+} TSettings;
+
+TSettings settings;
+
+void loadSettings(TSettings *settings) {
+	eeprom_read_block(settings, (const void *)0x00, sizeof(TSettings));
+}
+
+void saveSettings(TSettings *settings) {
+	eeprom_write_block(settings, (void *)0x00, sizeof(TSettings));
+}
+
 void init(void) {
 	SETD(TXLED);
 	SETD(RXLED);
@@ -52,6 +67,7 @@ void init(void) {
 	usart_init();
 	i2c_init();
 	sei();
+	loadSettings(&settings);
 }
 
 void lcd_printhex(uint8_t c)
@@ -94,6 +110,14 @@ void lcd_printsdec(int16_t pc) {
 	lcd_putstr(n);
 }
 
+int16_t timeToCm(int16_t time) {
+	return time/116;
+}
+
+int16_t timeToLiter(int16_t time) {
+	return (((int32_t)time)*10)/231;
+}
+
 int main(void)
 {
 	init();
@@ -122,21 +146,31 @@ int main(void)
 //		ds13xx_gettime(&time, 1);
 		uint16_t dist = hcsr04_getDistance();
 		avg_dist = (dist + 7*avg_dist)>>3;
+
+
 		uint16_t dist_cm = avg_dist/116;
 		uint16_t vol_l = (((uint32_t)avg_dist)*10)/231;
 
 		int16_t lvl = offlvl - vol_l;
 		int16_t lvl_on = offlvl - onlvl;
+//		lcd_printsdec(lvl);
+//		lcd_printsdec(lvl_on);
+//		lcd_printsdec(dist_cm);
+
 		lcd_printsdec(lvl);
 		lcd_printsdec(lvl_on);
-
 		lcd_printsdec(dist_cm);
+
 		lcd_putstr("              ");
 		usart_printhex(dist);
 
 		lcd_putchar(' ');
 		if (!PINV(OFF_LVL_BTN)) {
 			offlvl = vol_l;
+			if (avg_dist != settings.offLevel) {
+				settings.offLevel = avg_dist;
+				saveSettings(&settings);
+			}
 			lcd_putchar('+');
 		} else {
 			lcd_putchar('-');
@@ -144,6 +178,10 @@ int main(void)
 
 		if (!PINV(ON_LVL_BTN)) {
 			onlvl = vol_l;
+			if (avg_dist != settings.onLevel) {
+				settings.onLevel = avg_dist;
+				saveSettings(&settings);
+			}
 			lcd_putchar('+');
 		} else {
 			lcd_putchar('-');
