@@ -36,7 +36,7 @@ public class SimpleInteraction {
 
         int[] baudRates = {SerialPort.BAUDRATE_115200, SerialPort.BAUDRATE_57600, SerialPort.BAUDRATE_38400, SerialPort.BAUDRATE_19200, SerialPort.BAUDRATE_9600};
 
-        for (int i = 0; i < 160; i++) {
+        for (int i = 0; i < 16; i++) {
             for (int baudRate : baudRates) {
                 System.out.println(baudRate);
                 for (SerialPort serialPort : serialPorts) {
@@ -49,7 +49,7 @@ public class SimpleInteraction {
         		}
                 
                 try {
-    				Thread.sleep(16);
+    				Thread.sleep(1600);
     			} catch (InterruptedException e) {
     				e.printStackTrace();
     			}
@@ -78,7 +78,7 @@ public class SimpleInteraction {
                     try {
                         byte buffer[] = serialPort.readBytes(bytesCount);
                         String rxString = new String(buffer);
-                        System.out.print(serialPort.getPortName());
+//                        System.out.print(serialPort.getPortName());
                         System.out.println(rxString);
                     }
                     catch (SerialPortException ex) {
