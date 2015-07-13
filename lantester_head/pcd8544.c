@@ -212,9 +212,11 @@ void lcd_clear(uint8_t pattern)
     }
     video_buf.chg_start = 0;
     video_buf.chg_length = LCD_BYTES;
-    if (autosendbuf != 0) {
-    	lcd_send_buffer();
+    for (uint8_t i=0; i<LCD_CHARS; i++) {
+    	text_buf.buf[i] = 0;
     }
+    text_buf.pos = 0;
+    lcd_send_buffer();
 }
 
 void lcd_init(void)
@@ -264,8 +266,8 @@ void lcd_putchar(char ch) {
 }
 
 void lcd_textpos(uint8_t x, uint8_t y) {
-	if ((x<LCD_WIDTH) && (y<LCD_HEIGHT)) {
-		text_buf.pos = x + y*LCD_WIDTH;
+	if ((x<LCD_COLS) && (y<LCD_LINES)) {
+		text_buf.pos = x + y*LCD_COLS;
 	}
 }
 
