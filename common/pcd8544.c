@@ -132,6 +132,7 @@ TVideoBuf video_buf;
 TTextBuf text_buf;
 
 uint8_t overlay;
+uint8_t autosend_buffer;
 uint8_t rotate;
 uint8_t optimize_chg;
 
@@ -184,22 +185,28 @@ void lcd_send_text_buffer(void)
     for (uint8_t i=0; i<LCD_CHARS; i++) {
     	char out_char = text_buf.buf[i];
     	out_char = out_char>31?(out_char<128?out_char:32):32;
-    	for (uint8_t j=0; j<CHAR_WIDTH-1; j++) {
-    		if (overlay) {
-    			video_buf.buf[video_buf.pos] ^= pgm_read_byte(&font5x7[out_char-32][j]) << 1;
-    		} else {
-    			video_buf.buf[video_buf.pos] = pgm_read_byte(&font5x7[out_char-32][j]) << 1;
-    		}
-    		video_buf.pos++;
-    	}
-		if (!overlay) {
-			video_buf.buf[video_buf.pos] = 0;
+		if (out_char) {
+	    	for (uint8_t j=0; j<CHAR_WIDTH-1; j++) {
+					if (overlay) {
+						video_buf.buf[video_buf.pos] ^= pgm_read_byte(&font5x7[out_char-32][j]) << 1;
+					} else {
+						video_buf.buf[video_buf.pos] = pgm_read_byte(&font5x7[out_char-32][j]) << 1;
+					}
+	    		video_buf.pos++;
+	    	}
+			if (!overlay) {
+				video_buf.buf[video_buf.pos] = 0;
+			}
+			video_buf.pos++;
+		} else {
+			video_buf.pos+=CHAR_WIDTH;
 		}
-		video_buf.pos++;
     }
     video_buf.chg_start = 0;
     video_buf.chg_length = LCD_BYTES;
-    lcd_send_buffer();
+    if (autosend_buffer) {
+    	lcd_send_buffer();
+    }
 }
 
 void lcd_clear(uint8_t pattern)
@@ -213,7 +220,9 @@ void lcd_clear(uint8_t pattern)
     	text_buf.buf[i] = 0;
     }
     text_buf.pos = 0;
-    lcd_send_buffer();
+    if (autosend_buffer) {
+    	lcd_send_buffer();
+    }
 }
 
 void lcd_init(void)
@@ -250,6 +259,7 @@ void lcd_init(void)
     lcd_clear(0x00);
     overlay = 0;
     rotate = 0;
+    autosend_buffer = 1;
     CLRP(LCD_LED);
 }
 
@@ -285,6 +295,10 @@ void lcd_rotate(uint8_t protate) {
 
 void lcd_optimize(uint8_t poptimize) {
 	optimize_chg = poptimize;
+}
+
+void lcd_autosend_buffer(uint8_t pautosend_buffer) {
+	autosend_buffer = pautosend_buffer;
 }
 
 void lcd_point(uint8_t x, uint8_t y) {
