@@ -39,5 +39,6 @@ void lcd_point(uint8_t x, uint8_t y);
 void lcd_line(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
 void lcd_circle(uint8_t x0, uint8_t y0, uint8_t r);
 void lcd_send_buffer(void);
+void lcd_send_text_buffer(void);
 
 #endif /* PCD8544_H_ */
