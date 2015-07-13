@@ -10,7 +10,7 @@
 
 #include <avr/io.h>
 
-uint8_t at24cxx_readbyte(uint8_t addr);
-uint8_t at24cxx_writebyte(uint8_t addr, uint8_t byte);
+uint8_t at24cxx_readbyte(uint16_t addr);
+uint8_t at24cxx_writebyte(uint16_t addr, uint8_t byte);
 
 #endif /* AT24CXX_H_ */

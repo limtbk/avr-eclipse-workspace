@@ -114,8 +114,8 @@
 #define PORTA_A1 PORT_C1
 #define PORTA_A2 PORT_C2
 #define PORTA_A3 PORT_C3
-#define PORTA_A4 PORT_C4
-#define PORTA_A5 PORT_C5
+#define PORTA_A4 PORT_C4 //SDA
+#define PORTA_A5 PORT_C5 //SCL
 #define TXLED PORT_B5
 #define RXLED PORT_B5
 #elif defined(__AVR_ATmega16__) || defined(__AVR_ATmega32__)

@@ -8,7 +8,7 @@
 #include "ds13xx.h"
 #include "i2c.h"
 
-#define DS1307_I2C_ADDRESS 0x68
+#define DS13xx_I2C_ADDRESS 0x68
 
 TTime ttime(uint8_t hour, uint8_t min, uint8_t sec) {
 	TTime result;
@@ -29,7 +29,7 @@ TDate tdate(uint8_t weekday, uint8_t day, uint8_t month, uint8_t year) {
 
 uint8_t ds13xx_settime(TTime time, uint8_t bcd) {
 	uint8_t res = 0;
-	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 	if (res == 0) {
 		res |= i2c_write(0);
 		TTime wtime = time;
@@ -48,10 +48,10 @@ uint8_t ds13xx_settime(TTime time, uint8_t bcd) {
 
 uint8_t ds13xx_gettime(TTime *time, uint8_t bcd) {
 	uint8_t res = 0;
-	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 	if (res == 0) {
 		res |= i2c_write(0);
-		res |= i2c_start((DS1307_I2C_ADDRESS << 1) | 0x01);
+		res |= i2c_start((DS13xx_I2C_ADDRESS << 1) | 0x01);
 		time->sec = i2c_readAck();
 		time->min = i2c_readAck();
 		time->hour = i2c_readNak();
@@ -67,7 +67,7 @@ uint8_t ds13xx_gettime(TTime *time, uint8_t bcd) {
 
 uint8_t ds13xx_setdate(TDate date, uint8_t bcd) {
 	uint8_t res = 0;
-	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 	if (res == 0) {
 		res |= i2c_write(3);
 		TDate wdate = date;
@@ -87,10 +87,10 @@ uint8_t ds13xx_setdate(TDate date, uint8_t bcd) {
 
 uint8_t ds13xx_getdate(TDate *date, uint8_t bcd) {
 	uint8_t res = 0;
-	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 	if (res == 0) {
 		res |= i2c_write(3);
-		res |= i2c_start((DS1307_I2C_ADDRESS << 1) | 0x01);
+		res |= i2c_start((DS13xx_I2C_ADDRESS << 1) | 0x01);
 		date->weekday = i2c_readAck();
 		date->day = i2c_readAck();
 		date->month = i2c_readAck();
@@ -107,10 +107,10 @@ uint8_t ds13xx_getdate(TDate *date, uint8_t bcd) {
 
 uint8_t ds13xx_gettemperature(TTemperature *temperature, uint8_t bcd) {
 	uint8_t res = 0;
-	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 	if (res == 0) {
 		res |= i2c_write(0x11);
-		res |= i2c_start((DS1307_I2C_ADDRESS << 1) | 0x01);
+		res |= i2c_start((DS13xx_I2C_ADDRESS << 1) | 0x01);
 		temperature->intPart = i2c_readAck();
 		temperature->fracPart = i2c_readNak();
 		if (bcd != 0) {
@@ -125,10 +125,10 @@ uint8_t ds13xx_gettemperature(TTemperature *temperature, uint8_t bcd) {
 uint8_t ds13xx_readbyte(uint8_t addr) {
 	uint8_t res = 0;
 	uint8_t result = 0;
-	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 	if (res == 0) {
 		res |= i2c_write(addr);
-		res |= i2c_start((DS1307_I2C_ADDRESS << 1) | 0x01);
+		res |= i2c_start((DS13xx_I2C_ADDRESS << 1) | 0x01);
 		result = i2c_readNak();
 		i2c_stop();
 	}
@@ -137,7 +137,7 @@ uint8_t ds13xx_readbyte(uint8_t addr) {
 
 uint8_t ds13xx_writebyte(uint8_t addr, uint8_t byte) {
 	uint8_t res = 0;
-	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 	if (res == 0) {
 		res |= i2c_write(addr);
 		res |= i2c_write(byte);
@@ -149,10 +149,10 @@ uint8_t ds13xx_writebyte(uint8_t addr, uint8_t byte) {
 uint8_t ds13xx_readbytes(uint8_t addr, void *dst, uint8_t count) {
 	uint8_t res = 0;
 	if (count>0) {
-		res = i2c_start(DS1307_I2C_ADDRESS << 1);
+		res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 		if (res == 0) {
 			res |= i2c_write(addr);
-			res |= i2c_start((DS1307_I2C_ADDRESS << 1) | 0x01);
+			res |= i2c_start((DS13xx_I2C_ADDRESS << 1) | 0x01);
 			uint8_t *dest = dst;
 			uint8_t i;
 			for (i = 0; i < count-1; i++) {
@@ -167,7 +167,7 @@ uint8_t ds13xx_readbytes(uint8_t addr, void *dst, uint8_t count) {
 
 uint8_t ds13xx_writebytes(uint8_t addr, void *src, uint8_t count) {
 	uint8_t res = 0;
-	res = i2c_start(DS1307_I2C_ADDRESS << 1);
+	res = i2c_start(DS13xx_I2C_ADDRESS << 1);
 	if (res == 0) {
 		res |= i2c_write(addr);
 		uint8_t *source = src;

@@ -32,7 +32,7 @@
 							<tool id="de.innot.avreclipse.tool.compiler.winavr.app.debug.1748485888" name="AVR Compiler" superClass="de.innot.avreclipse.tool.compiler.winavr.app.debug">
 								<option id="de.innot.avreclipse.compiler.option.debug.level.316853724" name="Generate Debugging Info" superClass="de.innot.avreclipse.compiler.option.debug.level"/>
 								<option id="de.innot.avreclipse.compiler.option.optimize.356884981" name="Optimization Level" superClass="de.innot.avreclipse.compiler.option.optimize"/>
-								<option id="de.innot.avreclipse.compiler.option.incpath.1352158179" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
+								<option id="de.innot.avreclipse.compiler.option.incpath.1352158179" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common}&quot;"/>
 								</option>
 								<inputType id="de.innot.avreclipse.compiler.winavr.input.1443843675" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
@@ -42,8 +42,9 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.1985292940" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize"/>
 							</tool>
 							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.1432909143" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug">
-								<option id="de.innot.avreclipse.linker.option.otherobjs.436589408" superClass="de.innot.avreclipse.linker.option.otherobjs" valueType="userObjs">
+								<option id="de.innot.avreclipse.linker.option.otherobjs.436589408" name="Other Objects (*.o)" superClass="de.innot.avreclipse.linker.option.otherobjs" valueType="userObjs">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/ds13xx.o}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/at24cxx.o}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/hcsr04.o}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/i2c.o}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/pcd8544.o}&quot;"/>
@@ -66,7 +67,12 @@
 					</folderInfo>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="org.eclipse.cdt.managedbuilder.pkgconfig.extSettings" factoryId="org.eclipse.cdt.core.extension.container.factory">
+					<externalSetting contentTypes="org.eclipse.cdt.core.cSource:org.eclipse.cdt.core.cxxSource"/>
+					<externalSetting contentTypes="org.eclipse.cdt.managedbuilder.core.compiledObjectFile"/>
+				</externalSettings>
+			</storageModule>
 			<storageModule moduleId="packages"/>
 		</cconfiguration>
 		<cconfiguration id="de.innot.avreclipse.configuration.app.release.1333542144">

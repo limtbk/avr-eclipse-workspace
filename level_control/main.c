@@ -9,6 +9,8 @@
 #include "usart.h"
 #include "i2c.h"
 #include "ds13xx.h"
+#include "at24cxx.h"
+#include "macro.h"
 
 /*
  * Assume, that in current configuration there are following connections:
@@ -32,9 +34,6 @@
 #define ON_LVL_BTN PORTA_D12
 #define PUMP_CTRL PORTA_D9
 
-#define AT24CXX_I2C_ADDRESS 0x50
-
-
 typedef struct SettingsStruct {
 	int16_t lowestLevel;
 	int16_t onLevel;
@@ -43,29 +42,6 @@ typedef struct SettingsStruct {
 
 TSettings settings;
 
-uint8_t at24cxx_readbyte(uint8_t addr) {
-	uint8_t res = 0;
-	uint8_t result = 0;
-	res = i2c_start(AT24CXX_I2C_ADDRESS << 1);
-	if (res == 0) {
-		res |= i2c_write(addr);
-		res |= i2c_start((AT24CXX_I2C_ADDRESS << 1) | 0x01);
-		result = i2c_readNak();
-		i2c_stop();
-	}
-	return result;
-}
-
-uint8_t at24cxx_writebyte(uint8_t addr, uint8_t byte) {
-	uint8_t res = 0;
-	res = i2c_start(AT24CXX_I2C_ADDRESS << 1);
-	if (res == 0) {
-		res |= i2c_write(addr);
-		res |= i2c_write(byte);
-		i2c_stop();
-	}
-	return res;
-}
 
 void loadSettings(TSettings *settings) {
 	eeprom_read_block(settings, (const void *)0x00, sizeof(TSettings));
@@ -94,6 +70,7 @@ void init(void) {
 	lcd_init();
 	usart_init();
 	i2c_init();
+//	twiInit();
 	sei();
 	loadSettings(&settings);
 }
@@ -159,7 +136,6 @@ int main(void)
 	lcd_optimize(0);
 	lcd_rotate(1);
 	lcd_clear(0xFF);
-	lcd_send_buffer();
 
 	lcd_putstr("..............");
 	lcd_putstr("..............");
@@ -167,15 +143,50 @@ int main(void)
 	lcd_putstr("..............");
 	lcd_putstr("..............");
 	lcd_putstr("..............");
-	lcd_send_buffer();
+
+
+	// Test at24c memory
+	/*
+	while (1) {
+		for (int i = 0; i < 4096; i++) {
+			uint8_t d_o = 0xFF;
+			at24cxx_writebyte(i,d_o);
+			lcd_textpos(0,0);
+			lcd_printhex(HI(i));
+			lcd_printhex(LO(i));
+			lcd_putstr("  ");
+			lcd_printhex(0xFF);
+			lcd_send_text_buffer();
+			uint8_t d_i = at24cxx_readbyte(i);
+			lcd_textpos(0,1);
+			lcd_printhex(HI(i));
+			lcd_printhex(LO(i));
+			lcd_putstr("  ");
+			lcd_printhex(d_i);
+			lcd_send_text_buffer();
+			if (d_o!=d_i) {
+				lcd_textpos(0,2);
+				lcd_putstr("Error at ");
+				lcd_printhex(HI(i));
+				lcd_printhex(LO(i));
+				timer1_delay_ms(500);
+			}
+		}
+
+	}
+	*/
 
 	lcd_clear(0x00);
 	lcd_autosend_buffer(0);
 
-//	TTime time;
+	TTime time;
+	TDate date;
 	uint32_t avg_dist = 0;
 	while (1) {
-//		ds13xx_gettime(&time, 1);
+		ds13xx_gettime(&time, 1);
+		ds13xx_getdate(&date, 1);
+		uint8_t temp = bintodec(ds13xx_readbyte(0x11));
+
 		uint16_t dist = hcsr04_getDistance();
 		avg_dist = (dist + 7*avg_dist)>>3;
 
@@ -196,6 +207,18 @@ int main(void)
 		lcd_printsdec(avg_dist);
 		lcd_textpos(7,1);
 		lcd_printsdec(timeToCm(avg_dist));
+
+		lcd_textpos(0,4);
+		lcd_printhex(time.hour);
+		lcd_putchar(':');
+		lcd_printhex(time.min);
+		lcd_putchar(':');
+		lcd_printhex(time.sec);
+		lcd_putstr(" ");
+		lcd_printhex(temp);
+		lcd_putstr("C  ");
+
+
 
 //		lcd_putstr("              ");
 //		usart_printhex(dist);
