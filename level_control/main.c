@@ -32,12 +32,39 @@
 #define ON_LVL_BTN PORTA_D12
 #define PUMP_CTRL PORTA_D9
 
+#define AT24CXX_I2C_ADDRESS 0x50
+
+
 typedef struct SettingsStruct {
-	uint16_t onLevel;
-	uint16_t offLevel;
+	int16_t lowestLevel;
+	int16_t onLevel;
 } TSettings;
 
 TSettings settings;
+
+uint8_t at24cxx_readbyte(uint8_t addr) {
+	uint8_t res = 0;
+	uint8_t result = 0;
+	res = i2c_start(AT24CXX_I2C_ADDRESS << 1);
+	if (res == 0) {
+		res |= i2c_write(addr);
+		res |= i2c_start((AT24CXX_I2C_ADDRESS << 1) | 0x01);
+		result = i2c_readNak();
+		i2c_stop();
+	}
+	return result;
+}
+
+uint8_t at24cxx_writebyte(uint8_t addr, uint8_t byte) {
+	uint8_t res = 0;
+	res = i2c_start(AT24CXX_I2C_ADDRESS << 1);
+	if (res == 0) {
+		res |= i2c_write(addr);
+		res |= i2c_write(byte);
+		i2c_stop();
+	}
+	return res;
+}
 
 void loadSettings(TSettings *settings) {
 	eeprom_read_block(settings, (const void *)0x00, sizeof(TSettings));
@@ -80,8 +107,8 @@ void lcd_printhex(uint8_t c)
 
 void lcd_printdec(uint16_t pc) {
 	uint16_t c = pc;
-	char n[] = "              ";
-	uint8_t i = 4;
+	char n[] = "       ";
+	uint8_t i = 5;
 	n[i--] = (c % 10) + '0';
 	c = c / 10;
 	while (c>0) {
@@ -93,7 +120,7 @@ void lcd_printdec(uint16_t pc) {
 
 void lcd_printsdec(int16_t pc) {
 	int16_t c = pc;
-	char n[] = "              ";
+	char n[] = "       ";
 	if (c<0) {
 		c = -c;
 	}
@@ -122,15 +149,16 @@ int main(void)
 {
 	init();
 
-	uint16_t offlvl = 0;
-	uint16_t onlvl = 0;
+//	uint16_t offlvl = 0;
+//	uint16_t onlvl = 0;
 
 	uint8_t pump = 0;
 
 //	lcd_overlay(1);
 	lcd_optimize(0);
 	lcd_rotate(1);
-	lcd_clear(0x00);
+	lcd_clear(0xFF);
+	lcd_send_buffer();
 
 	lcd_putstr("..............");
 	lcd_putstr("..............");
@@ -138,75 +166,120 @@ int main(void)
 	lcd_putstr("..............");
 	lcd_putstr("..............");
 	lcd_putstr("..............");
+	lcd_send_buffer();
+
+	lcd_clear(0x00);
+	lcd_send_buffer();
 
 //	TTime time;
 	uint32_t avg_dist = 0;
 	while (1) {
-		lcd_textpos(0,0);
 //		ds13xx_gettime(&time, 1);
 		uint16_t dist = hcsr04_getDistance();
 		avg_dist = (dist + 7*avg_dist)>>3;
 
+//		uint16_t dist_cm = avg_dist/116;
+//		uint16_t vol_l = (((uint32_t)avg_dist)*10)/231;
 
-		uint16_t dist_cm = avg_dist/116;
-		uint16_t vol_l = (((uint32_t)avg_dist)*10)/231;
-
-		int16_t lvl = offlvl - vol_l;
-		int16_t lvl_on = offlvl - onlvl;
+		int16_t lvl = settings.lowestLevel - avg_dist;
+		int16_t lvl_on = settings.onLevel;
 //		lcd_printsdec(lvl);
 //		lcd_printsdec(lvl_on);
 //		lcd_printsdec(dist_cm);
 
-		lcd_printsdec(lvl);
-		lcd_printsdec(lvl_on);
-		lcd_printsdec(dist_cm);
+		lcd_textpos(0,0);
+		lcd_printsdec(timeToLiter(lvl));
+		lcd_textpos(7,0);
+		lcd_printsdec(timeToLiter(lvl_on));
+		lcd_textpos(0,1);
+		lcd_printsdec(avg_dist);
+		lcd_textpos(7,1);
+		lcd_printsdec(timeToCm(avg_dist));
 
-		lcd_putstr("              ");
-		usart_printhex(dist);
+//		lcd_putstr("              ");
+//		usart_printhex(dist);
 
-		lcd_putchar(' ');
 		if (!PINV(OFF_LVL_BTN)) {
-			offlvl = vol_l;
-			if (avg_dist != settings.offLevel) {
-				settings.offLevel = avg_dist;
+//			offlvl = vol_l;
+			if (avg_dist != settings.lowestLevel) {
+				settings.lowestLevel = avg_dist;
 				saveSettings(&settings);
 			}
+			lcd_textpos(5,2);
 			lcd_putchar('+');
 		} else {
+			lcd_textpos(5,2);
 			lcd_putchar('-');
 		}
 
 		if (!PINV(ON_LVL_BTN)) {
-			onlvl = vol_l;
-			if (avg_dist != settings.onLevel) {
-				settings.onLevel = avg_dist;
-				saveSettings(&settings);
+			if (lvl>0) {
+				if (lvl != settings.onLevel) {
+					settings.onLevel = lvl;
+					saveSettings(&settings);
+				}
 			}
+			lcd_textpos(12,2);
 			lcd_putchar('+');
 		} else {
+			lcd_textpos(12,2);
 			lcd_putchar('-');
 		}
 
-		if (offlvl>onlvl) {
+		if (settings.onLevel>0) {
 			if (pump) {
-				if (offlvl<vol_l) {
+				if (settings.lowestLevel<avg_dist) {
 					pump = 0;
 				}
 			} else {
-				if (onlvl>vol_l) {
+				if (settings.onLevel<lvl) {
 					pump = 1;
 				}
 			}
 			if (pump) {
-				lcd_putstr("            PUMP ON       ");
+				lcd_textpos(0,3);
+				lcd_putstr("PUMP ON       ");
 				SETP(PUMP_CTRL);
 			} else {
-				lcd_putstr("            PUMP OFF      ");
+				lcd_textpos(0,3);
+				lcd_putstr("PUMP OFF      ");
 				CLRP(PUMP_CTRL);
 			}
 		} else {
-			lcd_putstr("            CONFIG ERROR  ");
+			lcd_textpos(0,3);
+			lcd_putstr("CONFIG ERROR  ");
 		}
+
+#define xres 128
+		uint8_t xon = settings.onLevel/xres;
+		uint8_t xcur = lvl/xres;
+
+		lcd_overlay(0);
+		for (uint8_t y = 0; y<8; y++) {
+			lcd_line(0, LCD_HEIGHT-y-1, LCD_WIDTH-1, LCD_HEIGHT-y-1);
+		}
+		lcd_overlay(1);
+		for (uint8_t y = 0; y<8; y++) {
+			lcd_line(0, LCD_HEIGHT-y-1, LCD_WIDTH-1, LCD_HEIGHT-y-1);
+		}
+		lcd_overlay(0);
+
+		lcd_line(xon, LCD_HEIGHT-8, xon, LCD_HEIGHT-1);
+
+		if (lvl>0) {
+			uint8_t k = (((lvl % xres) * 5) / xres);
+			for (uint8_t x = 0; x<xcur; x++) {
+				if (x<xcur-1) {
+					lcd_line(x, LCD_HEIGHT-7, x, LCD_HEIGHT-2);
+				} else {
+					lcd_line(x, LCD_HEIGHT-k-2, x, LCD_HEIGHT-2);
+				}
+			}
+		}
+//		lcd_overlay(1);
+//		lcd_send_text_buffer();
+		lcd_overlay(0);
+		lcd_send_buffer();
 
 	}
 
