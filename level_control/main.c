@@ -38,6 +38,7 @@
 typedef struct SettingsStruct {
 	int16_t lowestLevel;
 	int16_t onLevel;
+	int16_t maxLevel;
 } TSettings;
 
 TSettings settings;
@@ -169,7 +170,7 @@ int main(void)
 	lcd_send_buffer();
 
 	lcd_clear(0x00);
-	lcd_send_buffer();
+	lcd_autosend_buffer(0);
 
 //	TTime time;
 	uint32_t avg_dist = 0;
@@ -199,10 +200,16 @@ int main(void)
 //		lcd_putstr("              ");
 //		usart_printhex(dist);
 
+		if (settings.maxLevel<lvl) {
+			settings.maxLevel = lvl;
+			saveSettings(&settings);
+		}
+
 		if (!PINV(OFF_LVL_BTN)) {
 //			offlvl = vol_l;
 			if (avg_dist != settings.lowestLevel) {
 				settings.lowestLevel = avg_dist;
+				settings.maxLevel = 0;
 				saveSettings(&settings);
 			}
 			lcd_textpos(5,2);
@@ -216,6 +223,7 @@ int main(void)
 			if (lvl>0) {
 				if (lvl != settings.onLevel) {
 					settings.onLevel = lvl;
+					settings.maxLevel = lvl;
 					saveSettings(&settings);
 				}
 			}
@@ -250,7 +258,7 @@ int main(void)
 			lcd_putstr("CONFIG ERROR  ");
 		}
 
-#define xres 128
+		uint16_t xres = settings.maxLevel / LCD_WIDTH;
 		uint8_t xon = settings.onLevel/xres;
 		uint8_t xcur = lvl/xres;
 
@@ -259,8 +267,8 @@ int main(void)
 			lcd_line(0, LCD_HEIGHT-y-1, LCD_WIDTH-1, LCD_HEIGHT-y-1);
 		}
 		lcd_overlay(1);
-		for (uint8_t y = 0; y<8; y++) {
-			lcd_line(0, LCD_HEIGHT-y-1, LCD_WIDTH-1, LCD_HEIGHT-y-1);
+		for (uint8_t y = 1; y<7; y++) {
+			lcd_line(1, LCD_HEIGHT-y-1, LCD_WIDTH-2, LCD_HEIGHT-y-1);
 		}
 		lcd_overlay(0);
 
@@ -276,9 +284,7 @@ int main(void)
 				}
 			}
 		}
-//		lcd_overlay(1);
-//		lcd_send_text_buffer();
-		lcd_overlay(0);
+
 		lcd_send_buffer();
 
 	}
