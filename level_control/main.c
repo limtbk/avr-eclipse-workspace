@@ -42,7 +42,6 @@ typedef struct SettingsStruct {
 
 TSettings settings;
 
-
 void loadSettings(TSettings *settings) {
 	eeprom_read_block(settings, (const void *)0x00, sizeof(TSettings));
 }
@@ -115,20 +114,17 @@ void lcd_printsdec(int16_t pc) {
 	lcd_putstr(n);
 }
 
-int16_t timeToCm(int16_t time) {
+int16_t us2ToCm(int16_t time) {
 	return time/116;
 }
 
-int16_t timeToLiter(int16_t time) {
+int16_t us2ToLiter(int16_t time) {
 	return (((int32_t)time)*10)/231;
 }
 
 int main(void)
 {
 	init();
-
-//	uint16_t offlvl = 0;
-//	uint16_t onlvl = 0;
 
 	uint8_t pump = 0;
 
@@ -144,43 +140,13 @@ int main(void)
 	lcd_putstr("..............");
 	lcd_putstr("..............");
 
-
-	// Test at24c memory
-	/*
-	while (1) {
-		for (int i = 0; i < 4096; i++) {
-			uint8_t d_o = 0xFF;
-			at24cxx_writebyte(i,d_o);
-			lcd_textpos(0,0);
-			lcd_printhex(HI(i));
-			lcd_printhex(LO(i));
-			lcd_putstr("  ");
-			lcd_printhex(0xFF);
-			lcd_send_text_buffer();
-			uint8_t d_i = at24cxx_readbyte(i);
-			lcd_textpos(0,1);
-			lcd_printhex(HI(i));
-			lcd_printhex(LO(i));
-			lcd_putstr("  ");
-			lcd_printhex(d_i);
-			lcd_send_text_buffer();
-			if (d_o!=d_i) {
-				lcd_textpos(0,2);
-				lcd_putstr("Error at ");
-				lcd_printhex(HI(i));
-				lcd_printhex(LO(i));
-				timer1_delay_ms(500);
-			}
-		}
-
-	}
-	*/
-
 	lcd_clear(0x00);
 	lcd_autosend_buffer(0);
 
 	TTime time;
 	TDate date;
+//	TAt24cHeaderBlock headerBlock;
+	uint16_t lastWrittenAddr = 0;
 	uint32_t avg_dist = 0;
 	while (1) {
 		ds13xx_gettime(&time, 1);
@@ -190,23 +156,17 @@ int main(void)
 		uint16_t dist = hcsr04_getDistance();
 		avg_dist = (dist + 7*avg_dist)>>3;
 
-//		uint16_t dist_cm = avg_dist/116;
-//		uint16_t vol_l = (((uint32_t)avg_dist)*10)/231;
-
 		int16_t lvl = settings.lowestLevel - avg_dist;
 		int16_t lvl_on = settings.onLevel;
-//		lcd_printsdec(lvl);
-//		lcd_printsdec(lvl_on);
-//		lcd_printsdec(dist_cm);
 
 		lcd_textpos(0,0);
-		lcd_printsdec(timeToLiter(lvl));
+		lcd_printsdec(us2ToLiter(lvl));
 		lcd_textpos(7,0);
-		lcd_printsdec(timeToLiter(lvl_on));
+		lcd_printsdec(us2ToLiter(lvl_on));
 		lcd_textpos(0,1);
 		lcd_printsdec(avg_dist);
 		lcd_textpos(7,1);
-		lcd_printsdec(timeToCm(avg_dist));
+		lcd_printsdec(us2ToCm(avg_dist));
 
 		lcd_textpos(0,4);
 		lcd_printhex(time.hour);
@@ -218,15 +178,8 @@ int main(void)
 		lcd_printhex(temp);
 		lcd_putstr("C  ");
 
-
-
 //		lcd_putstr("              ");
 //		usart_printhex(dist);
-
-		if (settings.maxLevel<lvl) {
-			settings.maxLevel = lvl;
-			saveSettings(&settings);
-		}
 
 		if (!PINV(OFF_LVL_BTN)) {
 //			offlvl = vol_l;
@@ -257,28 +210,44 @@ int main(void)
 			lcd_putchar('-');
 		}
 
-		if (settings.onLevel>0) {
-			if (pump) {
-				if (settings.lowestLevel<avg_dist) {
-					pump = 0;
-				}
-			} else {
-				if (settings.onLevel<lvl) {
-					pump = 1;
-				}
+		if (avg_dist < 32767) {
+			if (settings.maxLevel<lvl) {
+				settings.maxLevel = lvl;
+				saveSettings(&settings);
 			}
-			if (pump) {
-				lcd_textpos(0,3);
-				lcd_putstr("PUMP ON       ");
-				SETP(PUMP_CTRL);
+			uint16_t addrToWrite = ((date.weekday-1)*288 + dectobin(time.hour)*12 + dectobin(time.min)/5)*2;
+			if (addrToWrite!=lastWrittenAddr) {
+				at24cxx_write_block(addrToWrite, &avg_dist, 2);
+				lastWrittenAddr = addrToWrite;
+			}
+
+			if (settings.onLevel>0) {
+				if (pump) {
+					if (settings.lowestLevel<avg_dist) {
+						pump = 0;
+					}
+				} else {
+					if (settings.onLevel<lvl) {
+						pump = 1;
+					}
+				}
+				if (pump) {
+					lcd_textpos(0,3);
+					lcd_putstr("PUMP ON     ");
+					SETP(PUMP_CTRL);
+				} else {
+					lcd_textpos(0,3);
+					lcd_putstr("PUMP OFF    ");
+					CLRP(PUMP_CTRL);
+				}
 			} else {
 				lcd_textpos(0,3);
-				lcd_putstr("PUMP OFF      ");
-				CLRP(PUMP_CTRL);
+				lcd_putstr("CONFIG ERROR");
 			}
 		} else {
 			lcd_textpos(0,3);
-			lcd_putstr("CONFIG ERROR  ");
+			lcd_putstr("SONAR ERROR ");
+
 		}
 
 		uint16_t xres = settings.maxLevel / LCD_WIDTH;
