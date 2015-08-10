@@ -43,7 +43,6 @@
 							</tool>
 							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.521232218" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug">
 								<option id="de.innot.avreclipse.linker.option.otherobjs.1617073405" name="Other Objects (*.o)" superClass="de.innot.avreclipse.linker.option.otherobjs" valueType="userObjs">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/timer1.o}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/usart.o}&quot;"/>
 								</option>
 								<inputType id="de.innot.avreclipse.tool.linker.input.110192265" name="OBJ Files" superClass="de.innot.avreclipse.tool.linker.input">
@@ -62,7 +61,12 @@
 					</folderInfo>
 				</configuration>
 			</storageModule>
-			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings">
+				<externalSettings containerId="org.eclipse.cdt.managedbuilder.pkgconfig.extSettings" factoryId="org.eclipse.cdt.core.extension.container.factory">
+					<externalSetting contentTypes="org.eclipse.cdt.core.cSource:org.eclipse.cdt.core.cxxSource"/>
+					<externalSetting contentTypes="org.eclipse.cdt.managedbuilder.core.compiledObjectFile"/>
+				</externalSettings>
+			</storageModule>
 			<storageModule moduleId="packages"/>
 		</cconfiguration>
 		<cconfiguration id="de.innot.avreclipse.configuration.app.release.210773493">
