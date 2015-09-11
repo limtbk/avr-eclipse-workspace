@@ -32,7 +32,7 @@
 							<tool id="de.innot.avreclipse.tool.compiler.winavr.app.debug.41114116" name="AVR Compiler" superClass="de.innot.avreclipse.tool.compiler.winavr.app.debug">
 								<option id="de.innot.avreclipse.compiler.option.debug.level.569343281" name="Generate Debugging Info" superClass="de.innot.avreclipse.compiler.option.debug.level"/>
 								<option id="de.innot.avreclipse.compiler.option.optimize.131618344" name="Optimization Level" superClass="de.innot.avreclipse.compiler.option.optimize"/>
-								<option id="de.innot.avreclipse.compiler.option.incpath.1952550695" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
+								<option id="de.innot.avreclipse.compiler.option.incpath.1952550695" name="Include Paths (-I)" superClass="de.innot.avreclipse.compiler.option.incpath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common}&quot;"/>
 								</option>
 								<inputType id="de.innot.avreclipse.compiler.winavr.input.54373167" name="C Source Files" superClass="de.innot.avreclipse.compiler.winavr.input"/>
@@ -42,7 +42,7 @@
 								<option id="de.innot.avreclipse.cppcompiler.option.optimize.703874893" name="Optimization Level" superClass="de.innot.avreclipse.cppcompiler.option.optimize"/>
 							</tool>
 							<tool id="de.innot.avreclipse.tool.linker.winavr.app.debug.1603923133" name="AVR C Linker" superClass="de.innot.avreclipse.tool.linker.winavr.app.debug">
-								<option id="de.innot.avreclipse.linker.option.otherobjs.1389953558" superClass="de.innot.avreclipse.linker.option.otherobjs" valueType="userObjs">
+								<option id="de.innot.avreclipse.linker.option.otherobjs.1389953558" name="Other Objects (*.o)" superClass="de.innot.avreclipse.linker.option.otherobjs" valueType="userObjs">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/common/Debug/usart.o}&quot;"/>
 								</option>
 								<inputType id="de.innot.avreclipse.tool.linker.input.54919788" name="OBJ Files" superClass="de.innot.avreclipse.tool.linker.input">

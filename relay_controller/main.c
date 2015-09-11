@@ -13,20 +13,20 @@
 #include "ports.h"
 #include "usart.h"
 
-#define RELAY_PIN0 PORT_B0
-#define RELAY_PIN1 PORT_B1
-#define RELAY_PIN2 PORT_B2
-#define RELAY_PIN3 PORT_B3
+#define RELAY_PIN0 PORTA_D2
+#define RELAY_PIN1 PORTA_D3
+#define RELAY_PIN2 PORTA_D4
+#define RELAY_PIN3 PORTA_D5
 
 uint8_t status = 0;
 //uint32_t cc = 0;
 
 void init(void) {
 	usart_init();
-	CLRP(RELAY_PIN0);
-	CLRP(RELAY_PIN1);
-	CLRP(RELAY_PIN2);
-	CLRP(RELAY_PIN3);
+	SETP(RELAY_PIN0);
+	SETP(RELAY_PIN1);
+	SETP(RELAY_PIN2);
+	SETP(RELAY_PIN3);
 	SETD(RELAY_PIN0);
 	SETD(RELAY_PIN1);
 	SETD(RELAY_PIN2);
@@ -47,7 +47,7 @@ void loop() {
 						"s = status\n\r");
 				break;
 			}
-			case 'o':
+			case 'c':
 			{
 				char rel_ch = usart_getchr();
 				switch (rel_ch) {
@@ -77,7 +77,7 @@ void loop() {
 				}
 				break;
 			}
-			case 'c':
+			case 'o':
 			{
 				char rel_ch = usart_getchr();
 				switch (rel_ch) {
