@@ -148,6 +148,9 @@ int main(void)
 	usart_printstr("\n\rCapacity sensor\n\r");
 
 	uint16_t tarr[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	uint16_t tmin_arr[12] = {UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX, UINT16_MAX};
+	uint16_t tmax_arr[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	uint16_t tavg_arr[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	while (1) {
 
@@ -166,8 +169,12 @@ int main(void)
 		tarr[11] = measure_for_pin(&PIN(SSR11), PORTN(SSR11));
 
 		for (uint8_t ti = 0; ti < 12; ti++) {
-			usart_printhex(HI(tarr[ti]));
-			usart_printhex(LO(tarr[ti]));
+			tmin_arr[ti] = MIN(tmin_arr[ti], tarr[ti]);
+			tmax_arr[ti] = MAX(tmax_arr[ti], tarr[ti]);
+			tavg_arr[ti] = (15*tavg_arr[ti] + tarr[ti]) >> 4;
+			uint16_t t = tarr[ti] - tmin_arr[ti];
+			usart_printhex(HI(t));
+			usart_printhex(LO(t));
 			usart_putchr(' ');
 		}
 		usart_printstr("\n\r");
