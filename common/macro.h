@@ -18,4 +18,8 @@
 #define inb(addr) (addr)
 #define bit(var,bit) ((((var)&(1<<(bit)))!=0)?1:0)
 
+#define MIN(a,b) ((a)<(b)?(a):(b))
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define ABS(x) ((x)>0?(x):-(x))
+
 #endif /* MACRO_H_ */
